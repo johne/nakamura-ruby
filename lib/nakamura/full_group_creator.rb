@@ -32,9 +32,7 @@ module SlingUsers
       creator = User.new(creator_id, "testuser")
       @sling.switch_user(creator)
 
-      group = Group.new(groupname)
-
-      params = {"data" => JSON.generate({
+      data = JSON.generate({
         "id" => groupname,
         "title" => title,
         "description" => description,
@@ -51,8 +49,16 @@ module SlingUsers
           "roleString" => "Manager",
           "creator" => "true"
         }]
-      })}
+      })
+      
+      return create_full_group_with_data(groupname, data);
+    end
+    
+    def create_full_group_with_data(groupname, data)
+      group = Group.new(groupname)
 
+      params = {"data" => data }
+      
       result = @sling.execute_post(@sling.url_for($GROUP_WORLD_URI), params)
       if (result.code.to_i > 299)
         @log.error result.body
